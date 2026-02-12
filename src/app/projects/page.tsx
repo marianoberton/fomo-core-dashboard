@@ -15,11 +15,12 @@ import { useState } from 'react';
 function ProjectCard({ project }: { project: {
   id: string;
   name: string;
-  clientName?: string;
+  description?: string;
   status: string;
-  createdAt: string;
+  createdAt: Date;
   dailyBudgetUsd?: number;
 }}) {
+  const projectAny = project as any;
   return (
     <Link href={`/projects/${project.id}`}>
       <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer">
@@ -27,13 +28,13 @@ function ProjectCard({ project }: { project: {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="font-semibold text-white text-lg">{project.name}</h3>
-              <p className="text-sm text-zinc-400">{project.clientName || 'No client'}</p>
+              <p className="text-sm text-zinc-400">{project.description || 'No description'}</p>
             </div>
             <Badge variant={getStatusBadgeVariant(project.status)}>
               {project.status}
             </Badge>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-zinc-500">Agents</p>
@@ -42,15 +43,15 @@ function ProjectCard({ project }: { project: {
             <div>
               <p className="text-zinc-500">Daily Budget</p>
               <p className="text-white font-medium">
-                {project.dailyBudgetUsd 
-                  ? formatCurrency(project.dailyBudgetUsd) 
+                {projectAny.dailyBudgetUsd
+                  ? formatCurrency(projectAny.dailyBudgetUsd)
                   : 'Unlimited'}
               </p>
             </div>
           </div>
-          
+
           <p className="text-xs text-zinc-500 mt-4">
-            Created {formatRelativeTime(project.createdAt)}
+            Created {formatRelativeTime(project.createdAt.toISOString())}
           </p>
         </CardContent>
       </Card>
@@ -84,9 +85,9 @@ export default function ProjectsPage() {
   const { data, isLoading } = useProjects();
   
   const projects = data?.items ?? [];
-  const filteredProjects = projects.filter(p => 
+  const filteredProjects = projects.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.clientName?.toLowerCase().includes(search.toLowerCase())
+    p.description?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (

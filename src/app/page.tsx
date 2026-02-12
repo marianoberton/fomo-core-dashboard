@@ -62,16 +62,16 @@ function StatCard({
   );
 }
 
-function ApprovalCard({ 
-  approval 
-}: { 
-  approval: { 
-    id: string; 
-    tool: string; 
-    action: unknown;
+function ApprovalCard({
+  approval
+}: {
+  approval: {
+    id: string;
+    toolId: string;
+    toolInput: unknown;
     projectId: string;
-    createdAt: string;
-  } 
+    createdAt: Date;
+  }
 }) {
   return (
     <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-lg">
@@ -80,9 +80,9 @@ function ApprovalCard({
           <Clock className="w-4 h-4 text-amber-400" />
         </div>
         <div>
-          <p className="font-medium text-white">{approval.tool}</p>
+          <p className="font-medium text-white">{approval.toolId}</p>
           <p className="text-sm text-zinc-400">
-            {formatRelativeTime(approval.createdAt)}
+            {formatRelativeTime(approval.createdAt.toISOString())}
           </p>
         </div>
       </div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                       <div>
                         <p className="font-medium text-white">{project.name}</p>
                         <p className="text-sm text-zinc-400">
-                          {project.clientName || 'No client'}
+                          {project.description || 'No description'}
                         </p>
                       </div>
                       <Badge variant={getStatusBadgeVariant(project.status)}>

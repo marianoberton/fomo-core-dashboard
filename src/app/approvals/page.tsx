@@ -38,32 +38,32 @@ const toolIcons: Record<string, React.ElementType> = {
   'send-message': MessageSquare,
 };
 
-function getToolIcon(tool: string) {
-  return toolIcons[tool] || MessageSquare;
+function getToolIcon(toolId: string) {
+  return toolIcons[toolId] || MessageSquare;
 }
 
-function ApprovalCard({ 
+function ApprovalCard({
   approval,
   onApprove,
   onDeny,
   isPending,
-}: { 
+}: {
   approval: {
     id: string;
-    tool: string;
-    action: unknown;
+    toolId: string;
+    toolInput: unknown;
     projectId: string;
     status: string;
-    createdAt: string;
+    createdAt: Date;
   };
   onApprove: () => void;
   onDeny: () => void;
   isPending: boolean;
 }) {
-  const Icon = getToolIcon(approval.tool);
-  const actionPreview = typeof approval.action === 'object' && approval.action !== null
-    ? JSON.stringify(approval.action, null, 2).slice(0, 200)
-    : String(approval.action);
+  const Icon = getToolIcon(approval.toolId);
+  const actionPreview = typeof approval.toolInput === 'object' && approval.toolInput !== null
+    ? JSON.stringify(approval.toolInput, null, 2).slice(0, 200)
+    : String(approval.toolInput);
 
   return (
     <Card className="bg-zinc-900 border-zinc-800">
@@ -74,9 +74,9 @@ function ApprovalCard({
               <Icon className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-white mb-1">{approval.tool}</h3>
+              <h3 className="font-semibold text-white mb-1">{approval.toolId}</h3>
               <p className="text-sm text-zinc-400">
-                Pending approval • {formatRelativeTime(approval.createdAt)}
+                Pending approval • {formatRelativeTime(approval.createdAt.toISOString())}
               </p>
             </div>
           </div>

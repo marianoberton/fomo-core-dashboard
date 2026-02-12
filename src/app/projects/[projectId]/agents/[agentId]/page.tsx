@@ -64,12 +64,15 @@ export default function AgentDetailPage({ params }: Props) {
 
   useEffect(() => {
     if (agent) {
+      // TODO: These properties (model, temperature, maxTokens) don't exist in the Agent schema
+      // They're only in the mock data for development. Update when real API is integrated.
+      const agentAny = agent as any;
       setFormData({
         name: agent.name,
         description: agent.description || '',
-        model: agent.model,
-        temperature: agent.temperature || 0.7,
-        maxTokens: agent.maxTokens || 4096,
+        model: agentAny.model || '',
+        temperature: agentAny.temperature || 0.7,
+        maxTokens: agentAny.maxTokens || 4096,
       });
     }
   }, [agent]);

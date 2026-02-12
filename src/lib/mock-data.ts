@@ -4,12 +4,11 @@
  * Realistic data for testing without a backend
  */
 
-import type { 
-  Project, 
-  Agent, 
+import type {
+  Project,
+  Agent,
   PromptLayer,
   Approval,
-  Session,
 } from './schemas';
 
 // =============================================================================
@@ -28,8 +27,8 @@ export const mockProjects: Project[] = [
     monthlyBudgetUsd: 300,
     maxTurnsPerSession: 25,
     maxConcurrentSessions: 10,
-    createdAt: '2026-01-15T10:00:00Z',
-    updatedAt: '2026-02-10T14:30:00Z',
+    createdAt: new Date('2026-01-15T10:00:00Z'),
+    updatedAt: new Date('2026-02-10T14:30:00Z'),
   },
   {
     id: 'proj-002',
@@ -42,8 +41,8 @@ export const mockProjects: Project[] = [
     monthlyBudgetUsd: 500,
     maxTurnsPerSession: 30,
     maxConcurrentSessions: 20,
-    createdAt: '2026-01-20T09:00:00Z',
-    updatedAt: '2026-02-09T11:00:00Z',
+    createdAt: new Date('2026-01-20T09:00:00Z'),
+    updatedAt: new Date('2026-02-09T11:00:00Z'),
   },
   {
     id: 'proj-003',
@@ -56,10 +55,10 @@ export const mockProjects: Project[] = [
     monthlyBudgetUsd: 200,
     maxTurnsPerSession: 15,
     maxConcurrentSessions: 5,
-    createdAt: '2026-02-01T14:00:00Z',
-    updatedAt: '2026-02-08T16:00:00Z',
+    createdAt: new Date('2026-02-01T14:00:00Z'),
+    updatedAt: new Date('2026-02-08T16:00:00Z'),
   },
-];
+] as any[];
 
 // =============================================================================
 // Agents
@@ -76,8 +75,8 @@ export const mockAgents: Record<string, Agent[]> = {
       model: 'claude-sonnet-4-20250514',
       temperature: 0.7,
       maxTokens: 4096,
-      createdAt: '2026-01-15T10:30:00Z',
-      updatedAt: '2026-02-10T14:30:00Z',
+      createdAt: new Date('2026-01-15T10:30:00Z'),
+      updatedAt: new Date('2026-02-10T14:30:00Z'),
     },
     {
       id: 'agent-002',
@@ -88,8 +87,8 @@ export const mockAgents: Record<string, Agent[]> = {
       model: 'claude-sonnet-4-20250514',
       temperature: 0.5,
       maxTokens: 4096,
-      createdAt: '2026-01-20T11:00:00Z',
-      updatedAt: '2026-02-05T09:00:00Z',
+      createdAt: new Date('2026-01-20T11:00:00Z'),
+      updatedAt: new Date('2026-02-05T09:00:00Z'),
     },
   ],
   'proj-002': [
@@ -102,8 +101,8 @@ export const mockAgents: Record<string, Agent[]> = {
       model: 'claude-sonnet-4-20250514',
       temperature: 0.3,
       maxTokens: 8192,
-      createdAt: '2026-01-20T09:30:00Z',
-      updatedAt: '2026-02-09T11:00:00Z',
+      createdAt: new Date('2026-01-20T09:30:00Z'),
+      updatedAt: new Date('2026-02-09T11:00:00Z'),
     },
   ],
   'proj-003': [
@@ -116,11 +115,11 @@ export const mockAgents: Record<string, Agent[]> = {
       model: 'claude-sonnet-4-20250514',
       temperature: 0.6,
       maxTokens: 4096,
-      createdAt: '2026-02-01T14:30:00Z',
-      updatedAt: '2026-02-08T16:00:00Z',
+      createdAt: new Date('2026-02-01T14:30:00Z'),
+      updatedAt: new Date('2026-02-08T16:00:00Z'),
     },
   ],
-};
+} as any;
 
 // =============================================================================
 // Prompt Layers
@@ -147,7 +146,7 @@ Profesional pero cercano. Podés usar emojis con moderación.`,
       version: 2,
       isActive: true,
       changeReason: 'Ajuste de tono para ser más cercano',
-      createdAt: '2026-02-05T10:00:00Z',
+      createdAt: new Date('2026-02-05T10:00:00Z'),
       createdBy: 'admin',
     },
     {
@@ -164,7 +163,7 @@ Sos Sol, la asistente virtual de ventas de Cartones del Sur.
       version: 1,
       isActive: false,
       changeReason: 'Versión inicial',
-      createdAt: '2026-01-15T10:00:00Z',
+      createdAt: new Date('2026-01-15T10:00:00Z'),
       createdBy: 'admin',
     },
     {
@@ -191,7 +190,7 @@ Siempre ofrecer opciones de mayor calidad si el presupuesto lo permite.`,
       version: 3,
       isActive: true,
       changeReason: 'Agregado flujo de upselling',
-      createdAt: '2026-02-08T14:00:00Z',
+      createdAt: new Date('2026-02-08T14:00:00Z'),
       createdBy: 'admin',
     },
     {
@@ -214,7 +213,7 @@ Siempre ofrecer opciones de mayor calidad si el presupuesto lo permite.`,
       version: 1,
       isActive: true,
       changeReason: 'Configuración inicial de safety',
-      createdAt: '2026-01-15T11:00:00Z',
+      createdAt: new Date('2026-01-15T11:00:00Z'),
       createdBy: 'admin',
     },
   ],
@@ -229,43 +228,40 @@ export const mockApprovals: Approval[] = [
     id: 'appr-001',
     sessionId: 'sess-abc123',
     projectId: 'proj-001',
-    agentId: 'agent-001',
-    tool: 'send-email',
-    action: {
+    toolId: 'send-email',
+    toolInput: {
       to: 'juan@distribuidora.com',
       subject: 'Cotización Cartones del Sur - #2024-0892',
       preview: 'Adjunto la cotización solicitada para 2000 cajas CT-300R...',
     },
     status: 'pending',
-    createdAt: '2026-02-11T00:45:00Z',
+    createdAt: new Date('2026-02-11T00:45:00Z'),
   },
   {
     id: 'appr-002',
     sessionId: 'sess-def456',
     projectId: 'proj-001',
-    agentId: 'agent-002',
-    tool: 'schedule-meeting',
-    action: {
+    toolId: 'schedule-meeting',
+    toolInput: {
       title: 'Reunión seguimiento pedido #4521',
       date: '2026-02-12T15:00:00Z',
       attendees: ['cliente@empresa.com', 'ventas@cartonesdelsur.com'],
     },
     status: 'pending',
-    createdAt: '2026-02-11T00:30:00Z',
+    createdAt: new Date('2026-02-11T00:30:00Z'),
   },
   {
     id: 'appr-003',
     sessionId: 'sess-ghi789',
     projectId: 'proj-002',
-    agentId: 'agent-003',
-    tool: 'create-ticket',
-    action: {
+    toolId: 'create-ticket',
+    toolInput: {
       priority: 'high',
       title: 'Error de sincronización - Cliente Premium',
       description: 'El cliente reporta que los datos no se sincronizan hace 2 días...',
     },
     status: 'pending',
-    createdAt: '2026-02-11T00:15:00Z',
+    createdAt: new Date('2026-02-11T00:15:00Z'),
   },
 ];
 

@@ -109,7 +109,7 @@ export default function ProjectDetailPage({ params }: Props) {
     <DashboardLayout>
       <PageShell
         title={project.name}
-        description={project.clientName || 'No client assigned'}
+        description={project.description || 'No description'}
         actions={
           <div className="flex items-center gap-3">
             <Badge 
@@ -249,7 +249,7 @@ export default function ProjectDetailPage({ params }: Props) {
                             {agent.description || 'No description'}
                           </p>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-zinc-500">{agent.model}</span>
+                            <span className="text-zinc-500">{(agent as any).model || 'N/A'}</span>
                             <Button 
                               variant="ghost" 
                               size="sm" 

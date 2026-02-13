@@ -1,6 +1,6 @@
 /**
- * WebSocket Client for Nexus Core
- * 
+ * WebSocket Client for FOMO Core
+ *
  * Handles real-time communication with agents including:
  * - Message streaming
  * - Tool call events
@@ -8,7 +8,7 @@
  * - Session lifecycle events
  */
 
-const WS_BASE = process.env.NEXT_PUBLIC_NEXUS_WS_URL || 'ws://localhost:3002/api/v1/ws';
+const WS_BASE = process.env.NEXT_PUBLIC_FOMO_WS_URL || 'ws://localhost:3002/api/v1/ws';
 
 // =============================================================================
 // Event Types
@@ -80,7 +80,7 @@ export interface SessionEndedEvent {
   reason: 'completed' | 'error' | 'timeout' | 'terminated';
 }
 
-export type NexusEvent =
+export type FomoEvent =
   | SessionCreatedEvent
   | ContentDeltaEvent
   | ToolStartEvent
@@ -99,13 +99,13 @@ export type NexusEvent =
 export interface WebSocketConfig {
   apiKey: string;
   projectId: string;
-  onEvent: (event: NexusEvent) => void;
+  onEvent: (event: FomoEvent) => void;
   onOpen?: () => void;
   onError?: (error: Event) => void;
   onClose?: (event: CloseEvent) => void;
 }
 
-export interface NexusWebSocket {
+export interface FomoWebSocket {
   send: (content: string) => void;
   createSession: (agentId?: string, metadata?: Record<string, unknown>) => void;
   approve: (approvalId: string, note?: string) => void;
@@ -114,7 +114,7 @@ export interface NexusWebSocket {
   getState: () => 'connecting' | 'open' | 'closing' | 'closed';
 }
 
-export function createWebSocket(config: WebSocketConfig): NexusWebSocket {
+export function createWebSocket(config: WebSocketConfig): FomoWebSocket {
   const url = `${WS_BASE}?projectId=${config.projectId}`;
   const ws = new WebSocket(url);
 
@@ -129,7 +129,7 @@ export function createWebSocket(config: WebSocketConfig): NexusWebSocket {
 
   ws.onmessage = (event) => {
     try {
-      const data = JSON.parse(event.data as string) as NexusEvent;
+      const data = JSON.parse(event.data as string) as FomoEvent;
       config.onEvent(data);
     } catch (err) {
       console.error('Failed to parse WebSocket message:', err);
@@ -201,17 +201,17 @@ export interface ReconnectingWebSocketConfig extends WebSocketConfig {
   onReconnected?: () => void;
 }
 
-export interface ReconnectingNexusWebSocket extends NexusWebSocket {
+export interface ReconnectingFomoWebSocket extends FomoWebSocket {
   reconnect: () => void;
 }
 
 export function createReconnectingWebSocket(
   config: ReconnectingWebSocketConfig
-): ReconnectingNexusWebSocket {
+): ReconnectingFomoWebSocket {
   const reconnectDelay = config.reconnectDelayMs ?? 3000;
   const maxAttempts = config.maxReconnectAttempts ?? 5;
   
-  let ws: NexusWebSocket | null = null;
+  let ws: FomoWebSocket | null = null;
   let reconnectAttempts = 0;
   let shouldReconnect = true;
 

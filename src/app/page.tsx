@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GettingStarted } from '@/components/dashboard/getting-started';
 import { useProjects } from '@/lib/hooks/use-projects';
 import { usePendingApprovals } from '@/lib/hooks/use-approvals';
 import { useDashboardOverview } from '@/lib/hooks/use-costs';
@@ -101,22 +102,25 @@ function ApprovalCard({
 export default function DashboardPage() {
   const { data: projectsData, isLoading: projectsLoading } = useProjects();
   const { data: approvalsData, isLoading: approvalsLoading } = usePendingApprovals();
+  const { data: overviewData, isLoading: overviewLoading } = useDashboardOverview();
 
   const projectsCount = projectsData?.items?.length ?? 0;
   const activeProjects = projectsData?.items?.filter(p => p.status === 'active').length ?? 0;
   const pendingApprovals = approvalsData?.items ?? [];
-  
-  // Mock data for now - will come from API
-  const totalAgents = 7;
-  const activeSessions = 12;
-  const todayCost = 12.40;
+
+  // Get stats from API - fallback to 0 if not available
+  const totalAgents = overviewData?.activeAgentsCount ?? 0;
+  const activeSessions = overviewData?.activeSessionsCount ?? 0;
+  const todayCost = overviewData?.todayCostUsd ?? 0;
 
   return (
     <DashboardLayout>
-      <PageShell 
-        title="Dashboard" 
-        description="Overview of your Nexus Core instance"
+      <PageShell
+        title="Dashboard"
+        description="Overview of your FOMO Core instance"
       >
+        <GettingStarted />
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard 
@@ -126,22 +130,25 @@ export default function DashboardPage() {
             trend={`${activeProjects} active`}
             isLoading={projectsLoading}
           />
-          <StatCard 
-            title="Agents" 
+          <StatCard
+            title="Agents"
             value={totalAgents}
             icon={Bot}
             trend="All healthy"
+            isLoading={overviewLoading}
           />
-          <StatCard 
-            title="Active Sessions" 
+          <StatCard
+            title="Active Sessions"
             value={activeSessions}
             icon={MessageSquare}
+            isLoading={overviewLoading}
           />
-          <StatCard 
-            title="Cost Today" 
+          <StatCard
+            title="Cost Today"
             value={formatCurrency(todayCost)}
             icon={DollarSign}
             trend="+12% from yesterday"
+            isLoading={overviewLoading}
           />
         </div>
 
@@ -245,7 +252,7 @@ export default function DashboardPage() {
                   <DollarSign className="w-12 h-12 mx-auto mb-2 text-zinc-600" />
                   <p>Cost chart coming soon</p>
                   <p className="text-sm text-zinc-600 mt-1">
-                    Connect to Nexus Core API to see usage data
+                    Connect to FOMO Core API to see usage data
                   </p>
                 </div>
               </div>

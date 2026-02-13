@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { ModeIndicator } from "@/components/layout/mode-indicator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nexus Core Dashboard",
+  title: "FOMO Core Dashboard",
   description: "AI Agent Management Platform by FOMO",
 };
 
@@ -30,6 +31,7 @@ export default function RootLayout({
       >
         <Providers>
           {children}
+          <ModeIndicator />
         </Providers>
       </body>
     </html>

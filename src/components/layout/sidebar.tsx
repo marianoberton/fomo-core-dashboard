@@ -59,7 +59,7 @@ export function Sidebar() {
           </div>
           {!collapsed && (
             <span className="text-lg font-bold text-white">
-              NEXUS<span className="text-zinc-400">CORE</span>
+              FOMO<span className="text-zinc-400">CORE</span>
             </span>
           )}
         </Link>

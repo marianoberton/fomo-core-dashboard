@@ -1,6 +1,6 @@
-# Nexus Dashboard
+# FOMO Core Dashboard
 
-Web interface for Nexus Core - the FOMO AI Agent Management Platform.
+Web interface for FOMO Core - the FOMO AI Agent Management Platform.
 
 ## Quick Start
 
@@ -24,12 +24,12 @@ cp .env.local.example .env.local
 ```
 
 Required environment variables:
-- `NEXT_PUBLIC_NEXUS_API_URL` - Nexus Core API URL (default: http://localhost:3000)
-- `NEXT_PUBLIC_NEXUS_WS_URL` - WebSocket URL for real-time events
+- `NEXT_PUBLIC_FOMO_API_URL` - FOMO Core API URL (default: http://localhost:3002)
+- `NEXT_PUBLIC_FOMO_WS_URL` - WebSocket URL for real-time events
 
 ## Stack
 
-- **Next.js 15** (App Router)
+- **Next.js 16** (App Router)
 - **TypeScript** (strict mode)
 - **Tailwind CSS v4**
 - **shadcn/ui** components
@@ -120,4 +120,4 @@ src/
 
 ---
 
-Built by FOMO for Nexus Core.
+Built by FOMO for FOMO Core.

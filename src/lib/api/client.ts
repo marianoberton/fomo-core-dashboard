@@ -1,11 +1,11 @@
 /**
- * Nexus Core API Client
- * 
- * Provides typed API calls to the Nexus Core backend.
+ * FOMO Core API Client
+ *
+ * Provides typed API calls to the FOMO Core backend.
  * Uses Bearer token authentication with API key.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_NEXUS_API_URL || 'http://localhost:3000';
+const API_BASE = process.env.NEXT_PUBLIC_FOMO_API_URL || 'http://localhost:3002';
 
 export class ApiError extends Error {
   constructor(
@@ -75,7 +75,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
 
     const json = await response.json();
 
-    // Unwrap Nexus Core envelope: { success: true, data: T } → T
+    // Unwrap FOMO Core envelope: { success: true, data: T } → T
     if (json && typeof json === 'object' && 'success' in json && 'data' in json) {
       return json.data as T;
     }
@@ -110,8 +110,8 @@ let clientInstance: ApiClient | null = null;
 export function getApiClient(): ApiClient {
   if (!clientInstance) {
     // Try to get API key from localStorage
-    const apiKey = typeof window !== 'undefined' 
-      ? localStorage.getItem('nexus_api_key') 
+    const apiKey = typeof window !== 'undefined'
+      ? localStorage.getItem('fomo_api_key')
       : null;
     
     if (!apiKey) {
@@ -125,19 +125,19 @@ export function getApiClient(): ApiClient {
 
 export function setApiKey(apiKey: string): void {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('nexus_api_key', apiKey);
+    localStorage.setItem('fomo_api_key', apiKey);
   }
   clientInstance = createApiClient({ apiKey });
 }
 
 export function clearApiKey(): void {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('nexus_api_key');
+    localStorage.removeItem('fomo_api_key');
   }
   clientInstance = null;
 }
 
 export function isAuthenticated(): boolean {
   if (typeof window === 'undefined') return false;
-  return !!localStorage.getItem('nexus_api_key');
+  return !!localStorage.getItem('fomo_api_key');
 }

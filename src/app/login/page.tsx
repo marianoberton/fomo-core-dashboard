@@ -53,7 +53,7 @@ export default function LoginPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-white">
-            NEXUS<span className="text-zinc-400">CORE</span>
+            FOMO<span className="text-zinc-400">CORE</span>
           </CardTitle>
           <CardDescription className="text-zinc-400">
             Enter your API key to access the dashboard

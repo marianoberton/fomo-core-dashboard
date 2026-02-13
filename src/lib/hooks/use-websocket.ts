@@ -49,6 +49,37 @@ export function useWebSocket(options: UseWebSocketOptions): UseWebSocketReturn {
   }, [onEvent]);
 
   const connect = useCallback(() => {
+    // If using mocks, simulate connection
+    if (process.env.NEXT_PUBLIC_USE_MOCKS === 'true') {
+      setState('connected');
+      // Create a mock WS object to handle sends without errors
+      wsRef.current = {
+        send: (content: string) => {
+          console.log('[MOCK WS] Sending:', content);
+          // Echo back after a delay
+          setTimeout(() => {
+            handleEvent({
+              type: 'message.content_delta',
+              text: `[Mock Response] You said: ${content}`
+            });
+            handleEvent({
+              type: 'message.complete',
+              messageId: 'mock-msg-' + Date.now(),
+              usage: { inputTokens: 10, outputTokens: 10, costUsd: 0.001 },
+              traceId: 'mock-trace-' + Date.now()
+            });
+          }, 1000);
+        },
+        createSession: () => console.log('[MOCK WS] createSession'),
+        approve: () => console.log('[MOCK WS] approve'),
+        deny: () => console.log('[MOCK WS] deny'),
+        close: () => setState('disconnected'),
+        getState: () => 'open',
+        reconnect: () => {},
+      } as unknown as ReconnectingNexusWebSocket;
+      return;
+    }
+
     if (wsRef.current) {
       wsRef.current.close();
     }

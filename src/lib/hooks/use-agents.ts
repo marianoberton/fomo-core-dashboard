@@ -67,7 +67,21 @@ export function useCreateAgent(projectId: string) {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data: CreateAgent) => createAgent(projectId, data),
+    mutationFn: async (data: CreateAgent) => {
+      if (USE_MOCK) {
+        // Mock creation
+        const newAgent = {
+          id: `agent-${Math.random().toString(36).substr(2, 9)}`,
+          projectId,
+          ...data,
+          status: 'active',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        return newAgent as any;
+      }
+      return createAgent(projectId, data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: agentKeys.lists() });
     },
@@ -78,7 +92,15 @@ export function useUpdateAgent(projectId: string, agentId: string) {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data: UpdateAgent) => updateAgent(projectId, agentId, data),
+    mutationFn: async (data: UpdateAgent) => {
+      if (USE_MOCK) {
+        const agents = mockAgents[projectId] || [];
+        const existing = agents.find(a => a.id === agentId);
+        if (!existing) throw new Error('Agent not found');
+        return { ...existing, ...data, updatedAt: new Date() } as any;
+      }
+      return updateAgent(projectId, agentId, data);
+    },
     onSuccess: (updatedAgent) => {
       queryClient.setQueryData(agentKeys.detail(projectId, agentId), updatedAgent);
       queryClient.invalidateQueries({ queryKey: agentKeys.lists() });
@@ -90,7 +112,12 @@ export function useDeleteAgent(projectId: string) {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (agentId: string) => deleteAgent(projectId, agentId),
+    mutationFn: async (agentId: string) => {
+      if (USE_MOCK) {
+        return;
+      }
+      return deleteAgent(projectId, agentId);
+    },
     onSuccess: (_, agentId) => {
       queryClient.removeQueries({ queryKey: agentKeys.detail(projectId, agentId) });
       queryClient.invalidateQueries({ queryKey: agentKeys.lists() });

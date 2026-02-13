@@ -11,8 +11,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { listPromptLayers, createPromptLayer, activatePromptLayer } from '@/lib/api/prompts';
+import { useQueryClient } from '@tanstack/react-query';
+import { usePromptLayers, useCreatePromptLayer, useActivatePromptLayer } from '@/lib/hooks/use-prompts';
 import type { PromptLayer, PromptLayerType } from '@/lib/schemas';
 import { formatRelativeTime, cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -117,10 +117,7 @@ export default function PromptsPage({ params }: Props) {
   const [hasChanges, setHasChanges] = useState(false);
 
   // Fetch all prompt layers
-  const { data: layers, isLoading } = useQuery({
-    queryKey: ['prompt-layers', projectId],
-    queryFn: () => listPromptLayers({ projectId }),
-  });
+  const { data: layers, isLoading } = usePromptLayers({ projectId });
 
   // Filter layers by type
   const layersByType: Record<PromptLayerType, PromptLayer[]> = layers?.reduce((acc, layer) => {
@@ -135,34 +132,10 @@ export default function PromptsPage({ params }: Props) {
   const sortedLayers = [...activeLayers].sort((a, b) => b.version - a.version);
 
   // Create new version mutation
-  const createMutation = useMutation({
-    mutationFn: (content: string) => createPromptLayer(projectId, {
-      type: activeTab,
-      content,
-      changeReason: changeReason || undefined,
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['prompt-layers', projectId] });
-      setHasChanges(false);
-      setChangeReason('');
-      toast.success('New version saved');
-    },
-    onError: () => {
-      toast.error('Failed to save');
-    },
-  });
+  const createMutation = useCreatePromptLayer(projectId);
 
   // Activate version mutation
-  const activateMutation = useMutation({
-    mutationFn: (layerId: string) => activatePromptLayer(projectId, layerId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['prompt-layers', projectId] });
-      toast.success('Version activated');
-    },
-    onError: () => {
-      toast.error('Failed to activate version');
-    },
-  });
+  const activateMutation = useActivatePromptLayer(projectId);
 
   // Initialize editor content when active layer changes
   const handleTabChange = (value: string) => {
@@ -182,7 +155,20 @@ export default function PromptsPage({ params }: Props) {
       toast.error('Content cannot be empty');
       return;
     }
-    createMutation.mutate(editorContent);
+    createMutation.mutate({
+      type: activeTab,
+      content: editorContent,
+      changeReason: changeReason || undefined,
+    }, {
+      onSuccess: () => {
+        setHasChanges(false);
+        setChangeReason('');
+        toast.success('New version saved');
+      },
+      onError: () => {
+        toast.error('Failed to save');
+      }
+    });
   }
 
   if (isLoading) {
@@ -309,7 +295,10 @@ export default function PromptsPage({ params }: Props) {
                               key={layer.id}
                               layer={layer}
                               isActive={layer.isActive}
-                              onActivate={() => activateMutation.mutate(layer.id)}
+                              onActivate={() => activateMutation.mutate(layer.id, {
+                                onSuccess: () => toast.success('Version activated'),
+                                onError: () => toast.error('Failed to activate version')
+                              })}
                               isActivating={activateMutation.isPending}
                             />
                           ))}

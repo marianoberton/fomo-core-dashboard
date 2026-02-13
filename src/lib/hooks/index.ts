@@ -17,5 +17,8 @@ export * from './use-approvals';
 // Costs
 export * from './use-costs';
 
+// Prompts
+export * from './use-prompts';
+
 // WebSocket & Chat
 export * from './use-websocket';

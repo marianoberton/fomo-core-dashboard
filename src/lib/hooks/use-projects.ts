@@ -70,7 +70,22 @@ export function useCreateProject() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data: CreateProject) => createProject(data),
+    mutationFn: async (data: CreateProject) => {
+      if (USE_MOCK) {
+        // Mock creation
+        const newProject: Project = {
+          id: `proj-${Math.random().toString(36).substr(2, 9)}`,
+          ...data,
+          status: 'active',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        // Ideally we would add to mockProjects here but it's read-only
+        // So we just return success and let the UI update optimistically if possible
+        return newProject;
+      }
+      return createProject(data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
     },
@@ -81,7 +96,14 @@ export function useUpdateProject(projectId: string) {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (data: UpdateProject) => updateProject(projectId, data),
+    mutationFn: async (data: UpdateProject) => {
+      if (USE_MOCK) {
+        const existing = mockProjects.find(p => p.id === projectId);
+        if (!existing) throw new Error('Project not found');
+        return { ...existing, ...data, updatedAt: new Date() } as Project;
+      }
+      return updateProject(projectId, data);
+    },
     onSuccess: (updatedProject) => {
       queryClient.setQueryData(projectKeys.detail(projectId), updatedProject);
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
@@ -93,7 +115,12 @@ export function useDeleteProject() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (projectId: string) => deleteProject(projectId),
+    mutationFn: async (projectId: string) => {
+      if (USE_MOCK) {
+        return;
+      }
+      return deleteProject(projectId);
+    },
     onSuccess: (_, projectId) => {
       queryClient.removeQueries({ queryKey: projectKeys.detail(projectId) });
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });

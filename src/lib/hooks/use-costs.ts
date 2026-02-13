@@ -8,6 +8,9 @@ import {
   getCostAlerts,
   type UsageParams,
 } from '@/lib/api/costs';
+import { mockUsageData, mockDashboardStats } from '@/lib/mock-data';
+
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
 // Query keys
 export const costKeys = {
@@ -28,7 +31,17 @@ export const costKeys = {
 export function useProjectUsage(params: UsageParams) {
   return useQuery({
     queryKey: costKeys.projectUsage(params),
-    queryFn: () => getProjectUsage(params),
+    queryFn: async () => {
+      if (USE_MOCK) {
+        return {
+          totalCost: 125.40,
+          currency: 'USD',
+          period: 'last_7_days',
+          breakdown: mockUsageData.daily,
+        };
+      }
+      return getProjectUsage(params);
+    },
     enabled: !!params.projectId,
   });
 }
@@ -36,7 +49,16 @@ export function useProjectUsage(params: UsageParams) {
 export function useProjectUsageByAgent(projectId: string, period?: 'day' | 'week' | 'month') {
   return useQuery({
     queryKey: costKeys.projectUsageByAgent(projectId, period),
-    queryFn: () => getProjectUsageByAgent(projectId, period),
+    queryFn: async () => {
+      if (USE_MOCK) {
+        return {
+          projectId,
+          period: period || 'week',
+          agents: mockUsageData.byAgent,
+        };
+      }
+      return getProjectUsageByAgent(projectId, period);
+    },
     enabled: !!projectId,
   });
 }
@@ -44,7 +66,12 @@ export function useProjectUsageByAgent(projectId: string, period?: 'day' | 'week
 export function useDashboardOverview() {
   return useQuery({
     queryKey: costKeys.overview(),
-    queryFn: () => getDashboardOverview(),
+    queryFn: async () => {
+      if (USE_MOCK) {
+        return mockDashboardStats;
+      }
+      return getDashboardOverview();
+    },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 }
@@ -52,7 +79,22 @@ export function useDashboardOverview() {
 export function useCostAlerts(projectId?: string) {
   return useQuery({
     queryKey: projectId ? costKeys.projectAlerts(projectId) : costKeys.alerts(),
-    queryFn: () => getCostAlerts(projectId),
+    queryFn: async () => {
+      if (USE_MOCK) {
+        return [
+          {
+            id: 'alert-001',
+            projectId: 'proj-001',
+            type: 'budget_exceeded',
+            severity: 'warning',
+            message: 'Daily budget 80% used',
+            createdAt: new Date(),
+            data: { threshold: 80, current: 85 }
+          }
+        ];
+      }
+      return getCostAlerts(projectId);
+    },
     refetchInterval: 60000, // Refresh every minute
   });
 }

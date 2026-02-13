@@ -54,7 +54,14 @@ export function usePendingApprovals() {
 export function useApproval(approvalId: string) {
   return useQuery({
     queryKey: approvalKeys.detail(approvalId),
-    queryFn: () => getApproval(approvalId),
+    queryFn: async () => {
+      if (USE_MOCK) {
+        const approval = mockApprovals.find(a => a.id === approvalId);
+        if (!approval) throw new Error('Approval not found');
+        return approval;
+      }
+      return getApproval(approvalId);
+    },
     enabled: !!approvalId,
   });
 }
@@ -80,8 +87,19 @@ export function useApproveApproval() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ approvalId, note }: { approvalId: string; note?: string }) => 
-      approveApproval(approvalId, note),
+    mutationFn: async ({ approvalId, note }: { approvalId: string; note?: string }) => {
+      if (USE_MOCK) {
+        const existing = mockApprovals.find(a => a.id === approvalId);
+        if (!existing) throw new Error('Approval not found');
+        return { 
+          ...existing, 
+          status: 'approved', 
+          note, 
+          respondedAt: new Date() 
+        } as any;
+      }
+      return approveApproval(approvalId, note);
+    },
     onSuccess: (updatedApproval) => {
       queryClient.setQueryData(approvalKeys.detail(updatedApproval.id), updatedApproval);
       queryClient.invalidateQueries({ queryKey: approvalKeys.lists() });
@@ -120,8 +138,19 @@ export function useDenyApproval() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ approvalId, note }: { approvalId: string; note?: string }) => 
-      denyApproval(approvalId, note),
+    mutationFn: async ({ approvalId, note }: { approvalId: string; note?: string }) => {
+      if (USE_MOCK) {
+        const existing = mockApprovals.find(a => a.id === approvalId);
+        if (!existing) throw new Error('Approval not found');
+        return { 
+          ...existing, 
+          status: 'rejected', 
+          note, 
+          respondedAt: new Date() 
+        } as any;
+      }
+      return denyApproval(approvalId, note);
+    },
     onSuccess: (updatedApproval) => {
       queryClient.setQueryData(approvalKeys.detail(updatedApproval.id), updatedApproval);
       queryClient.invalidateQueries({ queryKey: approvalKeys.lists() });
